@@ -1,6 +1,8 @@
-import requests
+import base64
 import logging
 import time
+
+import requests
 
 import config
 
@@ -8,25 +10,59 @@ logger = logging.getLogger(__name__)
 
 
 def analyze_image(image_path: str) -> str:
-    headers = {"Authorization": f"Bearer {config.HF_TOKEN}"}
-    model_id = config.HF_VISION_MODEL
-
     with open(image_path, "rb") as f:
-        data = f.read()
+        image_bytes = f.read()
 
-    # Try configured vision model
+    # Try Gemini API first if key is configured
+    if config.GEMINI_API_KEY:
+        try:
+            result = _analyze_with_gemini(image_bytes)
+            if result:
+                return result
+        except Exception as e:
+            logger.warning(f"Gemini analysis failed: {e}")
+    else:
+        logger.info("GEMINI_API_KEY not set, skipping Gemini")
+
+    # Try HF Inference API (likely to fail for image-to-text)
     try:
-        result = _call_model(model_id, headers, data)
+        headers = {"Authorization": f"Bearer {config.HF_TOKEN}"}
+        result = _call_model(config.HF_VISION_MODEL, headers, image_bytes)
         if result:
             return result
     except Exception as e:
-        logger.warning(f"Vision model {model_id} failed: {e}")
+        logger.warning(f"HF vision model failed: {e}")
 
     raise Exception(
-        f"AI vision analysis tidak tersedia untuk model {model_id}. "
-        "HF Inference API tidak mendukung image-to-text gratis. "
-        "Silakan lanjutkan dengan deskripsi manual."
+        "Gagal menganalisa gambar. Silakan isi deskripsi manual."
     )
+
+
+def _analyze_with_gemini(image_bytes: bytes) -> str | None:
+    encoded = base64.b64encode(image_bytes).decode("utf-8")
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={config.GEMINI_API_KEY}"
+    payload = {
+        "contents": [{
+            "parts": [
+                {"text": "Describe this product photo in detail in English for an e-commerce listing. Include: what the product is, its color, material, shape, visible features, and any text or branding visible. Be specific and concise (max 100 words)."},
+                {"inline_data": {"mime_type": "image/jpeg", "data": encoded}},
+            ]
+        }]
+    }
+    resp = requests.post(url, json=payload, timeout=60)
+    if resp.status_code != 200:
+        raise Exception(f"Gemini HTTP {resp.status_code}: {resp.text[:200]}")
+
+    data = resp.json()
+    candidates = data.get("candidates", [])
+    if not candidates:
+        raise Exception("Gemini returned no candidates")
+
+    text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+    if not text:
+        raise Exception("Gemini returned empty text")
+
+    return text[:500]
 
 
 def _call_model(model_id: str, headers: dict, data: bytes) -> str | None:

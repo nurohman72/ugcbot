@@ -8,6 +8,7 @@ BASE_DIR = Path(__file__).parent
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 HF_TOKEN = os.getenv("HF_TOKEN")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 HF_VISION_MODEL = os.getenv("HF_VISION_MODEL", "microsoft/Florence-2-large")
 HF_GEN_MODEL = os.getenv("HF_GEN_MODEL", "black-forest-labs/FLUX.1-schnell")

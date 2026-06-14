@@ -16,7 +16,7 @@ Telegram bot untuk affiliate marketing. Upload foto produk, AI menganalisa, lalu
 |----------|-----------|
 | Runtime | Python 3.12+ |
 | Framework Bot | python-telegram-bot 20.8 (async) |
-| Vision AI | microsoft/Florence-2-large (terbatas — HF Inference API tidak menyediakan image-to-text gratis) |
+| Vision AI | Gemini 2.0 Flash via API (gratis) atau microsoft/Florence-2-large (jika GEMINI_API_KEY tidak diisi) |
 | Image Gen | black-forest-labs/FLUX.1-schnell |
 | Database | SQLite3 |
 | Image Proc | Pillow |
@@ -48,7 +48,8 @@ Telegram bot untuk affiliate marketing. Upload foto produk, AI menganalisa, lalu
    ```
    Isi `.env`:
    - `BOT_TOKEN` — dari [@BotFather](https://t.me/BotFather)
-   - `HF_TOKEN` — dari [Hugging Face Settings](https://huggingface.co/settings/tokens) (perlu permission "Make calls to Inference Providers")
+   - `HF_TOKEN` — dari [Hugging Face Settings](https://huggingface.co/settings/tokens)
+   - `GEMINI_API_KEY` — (opsional) dari [Google AI Studio](https://aistudio.google.com/apikey), untuk analisa foto produk otomatis
    - `HF_API_URL` — default `https://router.huggingface.co/hf-inference/models`
 
 5. **Jalankan**
