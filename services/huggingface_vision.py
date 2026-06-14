@@ -38,9 +38,36 @@ def analyze_image(image_path: str) -> str:
     )
 
 
+_GEMINI_MODELS = [
+    "gemini-3.1-flash-lite",
+    "gemini-3-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-2.0-flash",
+]
+
+
 def _analyze_with_gemini(image_bytes: bytes) -> str | None:
     encoded = base64.b64encode(image_bytes).decode("utf-8")
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={config.GEMINI_API_KEY}"
+
+    errors = []
+    for model in _GEMINI_MODELS:
+        try:
+            result = _call_gemini(model, encoded)
+            if result:
+                return result
+        except Exception as e:
+            msg = str(e)
+            errors.append(f"{model}: {msg}")
+            if "429" in msg or "quota" in msg.lower():
+                logger.warning(f"Gemini {model} quota exceeded, trying next model ...")
+            else:
+                logger.warning(f"Gemini {model} failed: {msg}")
+
+    raise Exception("; ".join(errors))
+
+
+def _call_gemini(model: str, encoded: str) -> str | None:
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={config.GEMINI_API_KEY}"
     payload = {
         "contents": [{
             "parts": [
@@ -49,19 +76,20 @@ def _analyze_with_gemini(image_bytes: bytes) -> str | None:
             ]
         }]
     }
+
     resp = requests.post(url, json=payload, timeout=60)
 
-    # Retry once on quota exceeded after short wait
+    # Retry 429 once per model
     if resp.status_code == 429:
-        logger.warning("Gemini quota exceeded, retrying in 5s ...")
-        time.sleep(5)
+        logger.warning(f"Gemini {model} 429, retrying in 10s ...")
+        time.sleep(10)
         resp = requests.post(url, json=payload, timeout=60)
 
     if resp.status_code == 429:
-        raise Exception("Kuota Gemini API habis. Tunggu beberapa saat atau isi ulang kuota.")
+        raise Exception(f"429 quota exceeded")
 
     if resp.status_code != 200:
-        raise Exception(f"Gemini HTTP {resp.status_code}: {resp.text[:200]}")
+        raise Exception(f"HTTP {resp.status_code}: {resp.text[:200]}")
 
     data = resp.json()
     candidates = data.get("candidates", [])
