@@ -437,12 +437,8 @@ async def handle_ai_confirm(update: Update, context):
         await query.edit_message_text(
             "🔄 AI akan generate ulang dengan variasi berbeda...\nMohon tunggu ⏳"
         )
-        session = db.get_session(chat_id)
-        retry_count = session.get("retry_count", 0)
-        if isinstance(retry_count, str):
-            retry_count = int(retry_count)
-        retry_count += 1
-        db.update_session(chat_id, retry_count=str(retry_count))
+        retry_count = context.user_data.get("retry_count", 0) + 1
+        context.user_data["retry_count"] = retry_count
         return await _generate_and_show_preview(update, context, retry_count)
 
     if query.data == "cancel_conv":
