@@ -40,7 +40,7 @@ def analyze_image(image_path: str) -> str:
 
 def _analyze_with_gemini(image_bytes: bytes) -> str | None:
     encoded = base64.b64encode(image_bytes).decode("utf-8")
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={config.GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={config.GEMINI_API_KEY}"
     payload = {
         "contents": [{
             "parts": [

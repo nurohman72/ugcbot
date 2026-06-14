@@ -16,7 +16,7 @@ Telegram bot untuk affiliate marketing. Upload foto produk, AI menganalisa, lalu
 |----------|-----------|
 | Runtime | Python 3.12+ |
 | Framework Bot | python-telegram-bot 20.8 (async) |
-| Vision AI | Gemini 2.0 Flash via API (gratis) atau microsoft/Florence-2-large (jika GEMINI_API_KEY tidak diisi) |
+| Vision AI | Gemini 1.5 Flash via API (gratis) atau microsoft/Florence-2-large (jika GEMINI_API_KEY tidak diisi) |
 | Image Gen | black-forest-labs/FLUX.1-schnell |
 | Database | SQLite3 |
 | Image Proc | Pillow |
