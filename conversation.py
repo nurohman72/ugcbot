@@ -45,19 +45,22 @@ def _build_product_prompt(session: dict, retry_count: int = 0) -> str:
     variation = ""
     if retry_count > 0:
         variants = [
-            "different pose, slightly different angle",
-            "natural candid pose",
-            "smiling confidently, looking at camera",
-            "looking slightly away, natural lighting",
+            "candid shot from slightly lower angle",
+            "natural pose, soft smile, looking at camera",
+            "looking down at the product with a gentle expression",
+            "three-quarter angle, natural daylight from window",
         ]
         variation = random.choice(variants)
 
     return (
-        f"A professional product photo of a {age_en} {gender_en} model "
+        f"UGC style photo of a {age_en} {gender_en} model "
         f"wearing/using: {product_desc}. "
-        f"The product is clearly visible and highlighted. "
-        f"Studio lighting, plain white background, full body shot, "
-        f"high quality, photorealistic, 4K, commercial product photography. "
+        f"The model is a real person, natural expression, "
+        f"holding the product comfortably in a real room setting. "
+        f"Sharp focus on the product and model face, perfectly exposed, "
+        f"natural window lighting, warm tones, "
+        f"shot on smartphone, realistic skin texture, "
+        f"not blurry, high detail on product texture and fabric. "
         f"{variation}"
     ).strip()
 
@@ -75,18 +78,26 @@ def _build_final_prompt(session: dict) -> str:
         age_en = age_map.get(age.lower(), "adult")
 
         return (
-            f"A {age_en} {gender_en} model confidently holding/wearing "
-            f"the product: {product_desc}. The product is the main focus, "
-            f"clearly visible. Professional studio photography, soft diffused "
-            f"lighting, plain pastel background, high quality, photorealistic, "
-            f"commercial product photography, 4K, highly detailed."
+            f"Realistic UGC photo of a {age_en} {gender_en} model "
+            f"holding/wearing {product_desc}. "
+            f"The model stands naturally in a cozy room with soft window light. "
+            f"Casual lifestyle photo, not a studio shoot. "
+            f"The product looks authentic, correct shape and proportions, "
+            f"realistic materials and textures, exactly matching the reference. "
+            f"Model's pose is relaxed and genuine, natural hands position. "
+            f"Sharp focus, not blurry, real skin texture, "
+            f"smartphone photography style, warm natural tones, "
+            f"no heavy editing, no filters, realistic lighting."
         )
     else:
         return (
-            f"A model wearing/using the product: {product_desc}. "
-            f"The product is the main focus, clearly visible. "
-            f"Professional studio photography, soft lighting, plain background, "
-            f"high quality, photorealistic, commercial product photography, 4K."
+            f"Realistic UGC photo of a model wearing/using {product_desc}. "
+            f"The model stands in a real room with natural daylight. "
+            f"Casual lifestyle shot, natural expression, authentic pose. "
+            f"The product looks real, correct proportions and details, "
+            f"exactly as described. Sharp focus, not blurry, "
+            f"real skin texture, natural lighting, "
+            f"smartphone style photography, warm tones."
         )
 
 
