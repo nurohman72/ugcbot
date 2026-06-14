@@ -40,7 +40,7 @@ def analyze_image(image_path: str) -> str:
 
 def _analyze_with_gemini(image_bytes: bytes) -> str | None:
     encoded = base64.b64encode(image_bytes).decode("utf-8")
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={config.GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={config.GEMINI_API_KEY}"
     payload = {
         "contents": [{
             "parts": [
@@ -50,6 +50,16 @@ def _analyze_with_gemini(image_bytes: bytes) -> str | None:
         }]
     }
     resp = requests.post(url, json=payload, timeout=60)
+
+    # Retry once on quota exceeded after short wait
+    if resp.status_code == 429:
+        logger.warning("Gemini quota exceeded, retrying in 5s ...")
+        time.sleep(5)
+        resp = requests.post(url, json=payload, timeout=60)
+
+    if resp.status_code == 429:
+        raise Exception("Kuota Gemini API habis. Tunggu beberapa saat atau isi ulang kuota.")
+
     if resp.status_code != 200:
         raise Exception(f"Gemini HTTP {resp.status_code}: {resp.text[:200]}")
 
