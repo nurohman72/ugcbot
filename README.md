@@ -4,7 +4,7 @@ Telegram bot untuk affiliate marketing. Upload foto produk, AI menganalisa, lalu
 
 ## Fitur
 
-- **Analisa Produk Otomatis** — Florence-2-large / BLIP2 mendeskripsikan produk dari foto
+- **Analisa Produk Otomatis** — (opsional) AI mendeskripsikan produk dari foto. Jika gagal, user bisa isi manual
 - **Generate Model AI** — FLUX.1-schnell membuat foto model sesuai gender & usia
 - **Upload Model Sendiri** — atau pakai foto model Anda sendiri
 - **State Machine** — percakapan 10 langkah yang terstruktur
@@ -16,11 +16,11 @@ Telegram bot untuk affiliate marketing. Upload foto produk, AI menganalisa, lalu
 |----------|-----------|
 | Runtime | Python 3.12+ |
 | Framework Bot | python-telegram-bot 20.8 (async) |
-| Vision AI | microsoft/Florence-2-large (fallback: BLIP2) |
+| Vision AI | microsoft/Florence-2-large (terbatas — HF Inference API tidak menyediakan image-to-text gratis) |
 | Image Gen | black-forest-labs/FLUX.1-schnell |
 | Database | SQLite3 |
 | Image Proc | Pillow |
-| Deploy | Hugging Face Inference API (serverless) |
+| Deploy | Hugging Face Inference API (router.huggingface.co) |
 
 ## Persiapan
 
@@ -48,7 +48,8 @@ Telegram bot untuk affiliate marketing. Upload foto produk, AI menganalisa, lalu
    ```
    Isi `.env`:
    - `BOT_TOKEN` — dari [@BotFather](https://t.me/BotFather)
-   - `HF_TOKEN` — dari [Hugging Face Settings](https://huggingface.co/settings/tokens)
+   - `HF_TOKEN` — dari [Hugging Face Settings](https://huggingface.co/settings/tokens) (perlu permission "Make calls to Inference Providers")
+   - `HF_API_URL` — default `https://router.huggingface.co/hf-inference/models`
 
 5. **Jalankan**
    ```bash

@@ -63,11 +63,12 @@ ugcbot/
 - `HF_TOKEN` — Hugging Face API token
 - `HF_VISION_MODEL` — default `microsoft/Florence-2-large`
 - `HF_GEN_MODEL` — default `black-forest-labs/FLUX.1-schnell`
+- `HF_API_URL` — default `https://router.huggingface.co/hf-inference/models`
 - `DATABASE_PATH` — default `ugcbot.db`
 - `PHOTO_DIR` — default `photos`
 
 ### Service Layer
-- `huggingface_vision.py`: `analyze_image(path) -> str` — POST ke HF Inference API, retry 503 otomatis, fallback BLIP2 on timeout
+- `huggingface_vision.py`: `analyze_image(path) -> str` — POST ke HF Inference API, retry 503 otomatis. Catatan: HF Inference API gratis **tidak mendukung** image-to-text. Vision analysis akan gagal dan bot akan meminta deskripsi manual dari user.
 - `huggingface_gen.py`: `generate_image(prompt, max_retries=3) -> bytes` — POST dengan payload `{"inputs": prompt}`, retry 503 & timeout
 - `image_utils.py`: `save_photo(bytes, subdir) -> str` — simpan sebagai JPEG kualitas 85, return path absolut
 
